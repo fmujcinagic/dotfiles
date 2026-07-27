@@ -9,7 +9,7 @@ echo "==> Installing core tools, dependencies, and desktop components..."
 sudo apt-get install -y \
   wget curl git thunar arandr flameshot arc-theme feh \
   i3blocks i3status i3 i3-wm lxappearance python3-pip pipx rofi unclutter \
-  cargo picom papirus-icon-theme imagemagick alacritty spice-vdagent \
+  cargo picom papirus-icon-theme imagemagick alacritty spice-vdagent i3lock \
   libxcb-shape0-dev libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev \
   libxcb1-dev libxcb-icccm4-dev libyajl-dev libev-dev libxcb-xkb-dev \
   libxcb-cursor-dev libxkbcommon-dev libxcb-xinerama0-dev libxkbcommon-x11-dev \
@@ -38,6 +38,7 @@ mkdir -p ~/.config/rofi
 mkdir -p ~/.config/alacritty
 
 echo "==> Copying dotfiles..."
+[ -f .tmux.conf ] && cp .tmux.conf ~/.tmux.conf
 [ -f .config/i3/config ] && cp .config/i3/config ~/.config/i3/config
 [ -f .config/alacritty/alacritty.toml ] && cp .config/alacritty/alacritty.toml ~/.config/alacritty/alacritty.toml
 [ -f .config/i3/i3blocks.conf ] && cp .config/i3/i3blocks.conf ~/.config/i3/i3blocks.conf
@@ -45,6 +46,7 @@ echo "==> Copying dotfiles..."
 [ -f .config/rofi/config ] && cp .config/rofi/config ~/.config/rofi/config
 [ -f .fehbg ] && cp .fehbg ~/.fehbg
 [ -f .config/i3/clipboard_fix.sh ] && cp .config/i3/clipboard_fix.sh ~/.config/i3/clipboard_fix.sh
+[ -f .config/i3/powermenu.sh ] && cp .config/i3/powermenu.sh ~/.config/i3/powermenu.sh
 [ -d .wallpaper ] && cp -r .wallpaper ~/.wallpaper 
 
 # Ensure SPICE daemon is set to run automatically in i3 config for VM clipboard sharing
