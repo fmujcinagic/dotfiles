@@ -21,7 +21,8 @@ mise, uv, nvim with the Omarchy LazyVim config replicated + harpoon,
 ghostty as default terminal (with the Omarchy config),
 lazygit, lazydocker, dive, ctop, k9s, just,
 delta, gh, yq, tlrc, trivy/gitleaks/checkov/grype/syft/hadolint/cosign/pre-commit,
-C/C++ toolchain (clang/gdb/cmake/ninja/ccache), ML venv (numpy/pandas/sklearn/
+C/C++ toolchain (clang/gdb/cmake/ninja/ccache), Java toolchain (OpenJDK LTS
+via mise + maven + gradle + jdtls in nvim), ML venv (numpy/pandas/sklearn/
 jupyter via uv), opencode, NVIDIA drivers (auto-detected) + ollama,
 KVM/virt-manager, fonts, desktop extras):
 

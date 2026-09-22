@@ -65,7 +65,7 @@ nvim_runtime() { # post-hook: ship the runtime dir alongside the binary
   [[ -d $tree/share/nvim ]] && { mkdir -p ~/.local/share; cp -a "$tree/share/nvim" ~/.local/share/; cp -a "$tree/share/man" ~/.local/share/ 2>/dev/null; }
 }
 
-log "[1/11] Apt packages (system-level tools where apt is fine)"
+log "[1/12] Apt packages (system-level tools where apt is fine)"
 $SUDO apt-get update || fail "apt update"
 $SUDO apt-get install -y \
   git curl wget unzip xz-utils zstd \
@@ -92,7 +92,7 @@ if [[ $SERVER == 0 ]]; then
   fi
 fi
 
-log "[2/11] GitHub CLI (official apt repo)"
+log "[2/12] GitHub CLI (official apt repo)"
 if command -v gh >/dev/null 2>&1; then
   ok "gh (already installed)"
 else
@@ -104,13 +104,13 @@ else
     && $SUDO apt-get update -qq && $SUDO apt-get install -y gh && ok "gh" || fail "gh"
 fi
 
-log "[3/11] Official installer scripts (they pin their own latest releases)"
+log "[3/12] Official installer scripts (they pin their own latest releases)"
 command -v starship >/dev/null 2>&1 || curl -sS https://starship.rs/install.sh | sh -s -- -y || fail starship
 command -v zoxide   >/dev/null 2>&1 || curl -Ss https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash || fail zoxide
 command -v uv       >/dev/null 2>&1 || curl -LsSf https://astral.sh/uv/install.sh | sh || fail uv
 command -v mise     >/dev/null 2>&1 || curl https://mise.run | sh || fail mise
 
-log "[4/11] Latest GitHub release binaries into ~/.local/bin"
+log "[4/12] Latest GitHub release binaries into ~/.local/bin"
 fetch_bin tldr-pages/tlrc        'x86_64.*linux-musl.*\.tar\.gz$'                tldr
 fetch_bin atuinsh/atuin          'atuin-x86_64.*linux-musl.*\.tar\.gz$'          atuin
 fetch_bin eza-community/eza      'eza_x86_64-unknown-linux-musl\.tar\.gz$'       eza
@@ -132,11 +132,20 @@ fetch_bin anchore/syft           'syft_.*linux_amd64\.tar\.gz$'                 
 fetch_bin sigstore/cosign        'cosign-linux-amd64$'                           cosign
 fetch_bin anomalyco/opencode     'opencode-linux-x64\.tar\.gz$'                  opencode
 
-log "[5/11] Python-based security tooling (isolated envs via uv)"
+log "[5/12] Python-based security tooling (isolated envs via uv)"
 command -v checkov    >/dev/null 2>&1 || uv tool install --quiet checkov    && ok checkov    || fail checkov
 command -v pre-commit >/dev/null 2>&1 || uv tool install --quiet pre-commit && ok pre-commit || fail pre-commit
 
-log "[6/11] ML/data-science venv (~/.venvs/ml, managed by uv)"
+log "[6/12] Java toolchain via mise (JDK LTS + Maven + Gradle)"
+if command -v mise >/dev/null 2>&1; then
+  command -v java   >/dev/null 2>&1 || mise use -g java@lts && ok "java (LTS)"  || fail "java"
+  command -v mvn    >/dev/null 2>&1 || mise use -g maven    && ok "maven"      || fail maven
+  command -v gradle >/dev/null 2>&1 || mise use -g gradle   && ok "gradle"     || fail gradle
+else
+  fail "java stack (mise not installed)"
+fi
+
+log "[7/12] ML/data-science venv (~/.venvs/ml, managed by uv)"
 if [[ ! -d ~/.venvs/ml ]]; then
   uv venv ~/.venvs/ml --python 3.13 && ok "created ~/.venvs/ml" || fail "ml venv"
 fi
@@ -145,7 +154,7 @@ uv pip install --quiet --python ~/.venvs/ml/bin/python \
   jupyterlab ipykernel || fail "ml packages"
 ok "~/.venvs/ml ready (activate with: ml)"
 
-log "[7/11] NVIDIA drivers (auto-detected; needed for GPU-accelerated Ollama)"
+log "[8/12] NVIDIA drivers (auto-detected; needed for GPU-accelerated Ollama)"
 if lspci 2>/dev/null | grep -qi nvidia; then
   if ! command -v nvidia-smi >/dev/null 2>&1; then
     $SUDO ubuntu-drivers install || $SUDO ubuntu-drivers autoinstall \
@@ -158,7 +167,7 @@ else
   echo "  - no NVIDIA GPU detected, skipping"
 fi
 
-log "[8/11] Ollama (local LLM runtime; uses NVIDIA GPU when present)"
+log "[9/12] Ollama (local LLM runtime; uses NVIDIA GPU when present)"
 if ! command -v ollama >/dev/null 2>&1; then
   curl -fsSL https://ollama.com/install.sh | $SUDO sh \
     && ok "ollama (systemd service installed; try: ollama pull llama3.2 && ollama run llama3.2)" \
@@ -167,7 +176,7 @@ else
   ok "ollama (already installed)"
 fi
 
-log "[9/11] Docker Engine (opt-in: --docker)"
+log "[10/12] Docker Engine (opt-in: --docker)"
 if [[ $WITH_DOCKER == 1 ]] && ! command -v docker >/dev/null 2>&1; then
   curl -fsSL https://get.docker.com | $SUDO sh -s \
     && $SUDO usermod -aG docker "$USER" \
@@ -178,7 +187,7 @@ else
   echo "  - skipped (re-run with: ./install-ubuntu.sh --docker)"
 fi
 
-log "[10/11] Nerd font (starship/eza icons) and shell hooks"
+log "[11/12] Nerd font (starship/eza icons) and shell hooks"
 if [[ $SERVER == 0 ]] && ! fc-list | grep -qi 'JetBrainsMono.*[Nn]erd'; then
   if curl -fL https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip -o /tmp/jbm.zip; then
     mkdir -p ~/.local/share/fonts && unzip -oq /tmp/jbm.zip -d ~/.local/share/fonts/ \
@@ -188,7 +197,7 @@ if [[ $SERVER == 0 ]] && ! fc-list | grep -qi 'JetBrainsMono.*[Nn]erd'; then
   fi
 fi
 
-log "[11/11] Dotfiles (backup + symlink bash/tmux/starship configs)"
+log "[12/12] Dotfiles (backup + symlink bash/tmux/starship configs)"
 ./install-shell.sh --no-deps
 
 echo

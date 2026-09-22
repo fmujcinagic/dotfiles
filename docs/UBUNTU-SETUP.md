@@ -40,6 +40,7 @@ atuin import bash     # fold pre-existing history into atuin, once
 | Official installers   | `~/.local/bin`         | starship\*, zoxide, uv, mise, atuin\*, **opencode** |
 | GitHub release assets | `~/.local/bin`         | eza, delta, tlrc (command `tldr`), neovim, lazygit, yq, lazydocker, dive, ctop, k9s, just, hadolint, trivy, gitleaks, grype, syft, cosign |
 | uv tool (isolated envs) | `~/.local/bin`       | checkov, pre-commit                      |
+| mise global tools       | mise shims         | **java (OpenJDK LTS), maven, gradle**    |
 | uv venv               | `~/.venvs/ml`          | numpy, pandas, scipy, scikit-learn, matplotlib, seaborn, plotly, polars, pyarrow, jupyterlab, ipykernel |
 | ubuntu-drivers (if NVIDIA GPU present) | kernel module + `nvidia-smi` | proprietary NVIDIA driver stack |
 | ollama.com installer  | `/usr/local/bin` + systemd service | **ollama** (uses the NVIDIA GPU after reboot) |
@@ -155,6 +156,7 @@ and `.config/tmux` are wired).
 | ollama     | local LLMs on your RTX          | `ollama pull llama3.2`, `ollama run llama3.2`, `ollama ps` shows GPU/CPU split |
 | ghostty    | default terminal (26.04 apt)    | config is symlinked from dotfiles; `shift+insert` paste |
 | `ml`       | activate the ML venv            | `ml && python -c "import pandas"` ; `uv pip install torch --python ~/.venvs/ml/bin/python` for GPU torch |
+| java/mvn/gradle | JDK LTS + build tools (via mise) | `java -version`, `mvn -version`, `gradle --version`; per-project: `mise use -g java@21` to pin an older JDK |
 | eza/bat/fd/rg | already in your muscle memory  | `l`, `ll`, `f`, plain `grep` = rg                       |
 
 ## Neovim — exact replica of the Omarchy setup
@@ -162,7 +164,9 @@ and `.config/tmux` are wired).
 `.config/nvim` is a copy of the current Omarchy config: **LazyVim** (starter,
 lockfile-pinned via `lazy-lock.json`) with the Omarchy extras — everforest
 theme, theme hot-reload, all-themes registry, transparency, OSC52 remote
-clipboard, neo-tree + clangd/python/rust language extras. Autocomplete
+clipboard, neo-tree + clangd/python/rust language extras, plus a `java.lua`
+enabling LazyVim's Java extra (jdtls via Mason — needs the mise JDK >= 21).
+Autocomplete
 (blink.cmp), LSP, treesitter, and Mason tooling all come from LazyVim itself.
 
 On first `nvim` launch lazy.nvim bootstraps everything and installs the pinned
