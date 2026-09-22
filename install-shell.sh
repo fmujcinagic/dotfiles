@@ -14,11 +14,12 @@ if [[ $DEPS == 1 ]] && command -v apt-get >/dev/null 2>&1; then
 
   if ! command -v eza >/dev/null 2>&1; then
     echo "==> Installing eza (not in Ubuntu repos)..."
-    arch=$(dpkg --print-architecture)
-    ver=$(curl -fsSL https://api.github.com/repos/eza-community/eza/releases/latest \
-      | grep -oP '"tag_name":\s*"v\K[0-9.]+')
-    if curl -fL "https://github.com/eza-community/eza/releases/download/v${ver}/eza_${ver}_${arch}.deb" -o /tmp/eza.deb; then
-      sudo dpkg -i /tmp/eza.deb && rm /tmp/eza.deb
+    url=$(curl -fsSL https://api.github.com/repos/eza-community/eza/releases/latest \
+      | grep -oP '"browser_download_url":\s*"\K[^"]+' \
+      | grep -i "eza_$(uname -m)-unknown-linux-musl\.tar\.gz$" | head -1)
+    if [[ -n $url ]] && curl -fL "$url" -o /tmp/eza.tgz; then
+      mkdir -p ~/.local/bin && tar xzf /tmp/eza.tgz -C /tmp eza \
+        && install -m 0755 /tmp/eza ~/.local/bin/eza && rm /tmp/eza /tmp/eza.tgz
     else
       echo "!! eza install failed; l/ll aliases will be skipped."
     fi

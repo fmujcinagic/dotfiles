@@ -32,6 +32,12 @@ for f in /usr/share/fzf/shell/key-bindings.bash /usr/share/fzf/key-bindings.bash
   [[ -r $f ]] && source $f
 done
 
+# Tool inits (guarded so they're no-ops when the tool isn't installed).
+# atuin init goes last so it wins the Ctrl+R binding over fzf.
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)" && alias at='z $(fzf)'
+command -v mise   >/dev/null 2>&1 && eval "$(mise activate bash)"
+command -v atuin  >/dev/null 2>&1 && eval "$(atuin init bash)"
+
 # Bigger, deduped history
 HISTSIZE=50000
 HISTFILESIZE=100000

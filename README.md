@@ -14,8 +14,20 @@ pieces are guarded and silently skipped elsewhere.
 
 ### Replicate on a new machine
 
+**Fresh Ubuntu — one-shot** (dotfiles + tmux/fzf/eza/etc. + zoxide, atuin,
+mise, uv, nvim, lazygit, delta, gh, yq, tlrc, fonts, desktop extras):
+
 ```sh
 git clone git@github.com:fmujcinagic/dotfiles.git ~/dotfiles
+cd ~/dotfiles && ./install-ubuntu.sh          # add --server for headless
+```
+
+See [docs/UBUNTU-SETUP.md](docs/UBUNTU-SETUP.md) for what/where/why and the
+manual post-install steps (gnome tiling, copyq, timeshift, ssh key, delta).
+
+**Just the shell configs** (any Linux, incl. Arch/Omarchy — symlinks only):
+
+```sh
 cd ~/dotfiles && ./install-shell.sh        # add --no-deps to skip apt/starship installs
 ```
 
