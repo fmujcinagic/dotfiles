@@ -54,6 +54,18 @@ alias n="nvim"
 alias nn="nvim ~/.config/nvim"
 alias bashrc="nvim ~/.bashrc && source ~/.bashrc"
 
+# TUI wrappers (only when installed)
+command -v lazygit     >/dev/null 2>&1 && alias g='lazygit'
+command -v lazydocker  >/dev/null 2>&1 && alias ld='lazydocker'
+command -v ctop        >/dev/null 2>&1 && alias topc='ctop'
+command -v k9s         >/dev/null 2>&1 && alias k=k9s
+alias scanfs='trivy fs --scanners vuln,secret,misconfig .'
+alias scanimg='trivy image'
+alias just='just --choose'
+
+# ML venv (created by install-ubuntu.sh via uv)
+[[ -f ~/.venvs/ml/bin/activate ]] && alias ml='source ~/.venvs/ml/bin/activate'
+
 # Safety nets for destructive ops
 alias rm='rm -I'
 alias mkdir='mkdir -pv'

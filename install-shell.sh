@@ -47,5 +47,7 @@ link .bashrc
 link .bash_profile
 link .config/tmux/tmux.conf
 link .config/starship.toml
+link .config/nvim
+link .config/ghostty
 
 echo "Done. Reload your shell (or log out/in) and restart tmux."

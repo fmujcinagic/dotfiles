@@ -11,15 +11,23 @@ pieces are guarded and silently skipped elsewhere.
 | `.bash_profile`          | `~/.bash_profile`            |
 | `.config/tmux/tmux.conf` | `~/.config/tmux/tmux.conf`   |
 | `.config/starship.toml`  | `~/.config/starship.toml`    |
+| `.config/nvim`           | `~/.config/nvim` (dir)       |
+| `.config/ghostty`        | `~/.config/ghostty` (dir)    |
 
 ### Replicate on a new machine
 
 **Fresh Ubuntu — one-shot** (dotfiles + tmux/fzf/eza/etc. + zoxide, atuin,
-mise, uv, nvim, lazygit, delta, gh, yq, tlrc, fonts, desktop extras):
+mise, uv, nvim with the Omarchy LazyVim config replicated + harpoon,
+ghostty as default terminal (with the Omarchy config),
+lazygit, lazydocker, dive, ctop, k9s, just,
+delta, gh, yq, tlrc, trivy/gitleaks/checkov/grype/syft/hadolint/cosign/pre-commit,
+C/C++ toolchain (clang/gdb/cmake/ninja/ccache), ML venv (numpy/pandas/sklearn/
+jupyter via uv), opencode, NVIDIA drivers (auto-detected) + ollama,
+KVM/virt-manager, fonts, desktop extras):
 
 ```sh
 git clone git@github.com:fmujcinagic/dotfiles.git ~/dotfiles
-cd ~/dotfiles && ./install-ubuntu.sh          # add --server for headless
+cd ~/dotfiles && ./install-ubuntu.sh          # add --server for headless, --docker for Docker Engine
 ```
 
 See [docs/UBUNTU-SETUP.md](docs/UBUNTU-SETUP.md) for what/where/why and the
@@ -32,7 +40,8 @@ cd ~/dotfiles && ./install-shell.sh        # add --no-deps to skip apt/starship 
 ```
 
 The installer backs up any existing non-symlinked file before linking.
-Ubuntu 24.04+ is assumed (tmux >= 3.4 for `extended-keys-format`).
+Ubuntu 26.04 LTS is the target (24.04+ works; tmux >= 3.4 required for
+`extended-keys-format`).
 
 Installed deps: tmux, fzf, ripgrep, bat, fd, ncurses-term, eza (from the
 eza-community GitHub release), starship. Debian/Ubuntu `fd`/`bat` are aliased

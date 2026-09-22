@@ -1,8 +1,8 @@
 # Ubuntu productivity setup — guidance
 
-Companion to `install-ubuntu.sh`. Target: Ubuntu 24.04+ on x86_64 (Wayland
-default session). The script is idempotent — re-run it any time to pull new
-versions of the GitHub-installed tools.
+Companion to `install-ubuntu.sh`. Target: **Ubuntu 26.04 LTS** on x86_64
+(24.04 also works; Wayland default session). The script is idempotent —
+re-run it any time to pull new versions of the GitHub-installed tools.
 
 ## Quick start (fresh machine)
 
@@ -12,13 +12,19 @@ git clone git@github.com:fmujcinagic/dotfiles.git ~/dotfiles   # or https:// URL
 cd ~/dotfiles && ./install-ubuntu.sh
 ```
 
-Headless box (no GNOME/desktop bits, skips fonts/copyq/timeshift):
+Headless box (no GNOME/desktop/VM bits, skips fonts/copyq/timeshift/virt-manager):
 
 ```sh
 ./install-ubuntu.sh --server
 ```
 
-Then log out/in and finish the two one-time steps:
+Want Docker Engine + Compose (official repo, adds you to the `docker` group):
+
+```sh
+./install-ubuntu.sh --docker
+```
+
+Then log out/in (twice if `--docker`: group membership needs a fresh login) and finish the one-time steps:
 
 ```sh
 gh auth login         # GitHub CLI
@@ -29,10 +35,16 @@ atuin import bash     # fold pre-existing history into atuin, once
 
 | Source                | Land in                | Tools                                    |
 | --------------------- | ---------------------- | ---------------------------------------- |
-| apt                   | `/usr/bin`             | tmux, fzf, ripgrep, bat, fd-find, btop, jq, ncurses-term, gnome-tweaks, copyq, timeshift, gh (own repo) |
-| Official installers   | `~/.local/bin`         | starship\*, zoxide, uv, mise, atuin\*    |
-| GitHub release assets | `~/.local/bin`         | eza, delta, tlrc (command `tldr`), neovim, lazygit, yq |
-| Dotfiles symlinks     | `~/`                   | `.bashrc`, `.bash_profile`, `.config/tmux/tmux.conf`, `.config/starship.toml` |
+| apt (core)            | `/usr/bin`             | tmux, fzf, ripgrep, bat, fd-find, btop, jq, ncurses-term, build-essential, cmake, ninja, pkg-config, ccache, **clang/clangd/clang-tools, gdb, lldb, valgrind, cppcheck** (C/C++), python3-dev, ubuntu-drivers-common, gh (own repo) |
+| apt (desktop only)    | `/usr/bin`             | **ghostty** (Ubuntu 26.04 universe — made the default terminal via gsettings + x-terminal-emulator), gnome-tweaks, copyq, timeshift, qemu-kvm, libvirt, virt-manager, wl-clipboard |
+| Official installers   | `~/.local/bin`         | starship\*, zoxide, uv, mise, atuin\*, **opencode** |
+| GitHub release assets | `~/.local/bin`         | eza, delta, tlrc (command `tldr`), neovim, lazygit, yq, lazydocker, dive, ctop, k9s, just, hadolint, trivy, gitleaks, grype, syft, cosign |
+| uv tool (isolated envs) | `~/.local/bin`       | checkov, pre-commit                      |
+| uv venv               | `~/.venvs/ml`          | numpy, pandas, scipy, scikit-learn, matplotlib, seaborn, plotly, polars, pyarrow, jupyterlab, ipykernel |
+| ubuntu-drivers (if NVIDIA GPU present) | kernel module + `nvidia-smi` | proprietary NVIDIA driver stack |
+| ollama.com installer  | `/usr/local/bin` + systemd service | **ollama** (uses the NVIDIA GPU after reboot) |
+| Docker official script (opt-in `--docker`) | `/usr/bin` | docker, docker compose      |
+| Dotfiles symlinks     | `~/`                   | `.bashrc`, `.bash_profile`, `.config/tmux/tmux.conf`, `.config/starship.toml`, `.config/nvim`, `.config/ghostty` |
 
 \* starship goes to `/usr/local/bin` via sudo; atuin's binary also lives in
 `~/.atuin/bin` (on PATH via `~/.local/bin`).
@@ -66,10 +78,14 @@ and LSP support, so the script deliberately ignores it.
 
 ## Manual steps after the script (desktop only)
 
-1. **Terminal + font.** Pick one: `sudo apt install alacritty kitty`, or
-   Ghostty's official apt repo (`https://packagist.ghostty.dev` — see their
-   docs). Set `JetBrainsMono Nerd Font` as terminal font (on Omarchy the
-   terminal themes are managed; on Ubuntu do it per terminal).
+1. **Terminal.** Ghostty is installed (Ubuntu 26.04's own apt package — no
+   PPA needed), set as the GNOME default, and its config is symlinked from
+   `.config/ghostty` (same as on Omarchy; the dynamic theme `config-file =
+   ?"..."` include is guarded and simply skipped without Omarchy). The
+   JetBrainsMono Nerd Font installed by the script is referenced by that
+   config. Log out/in after a `--docker` install or an NVIDIA driver install
+   (the latter needs a reboot for `nvidia-smi`/Ollama GPU to come up — check
+   with `ollama ps`, model should list "100% GPU").
 2. **Tiling.** Vanilla GNOME won't feel like Hyprland. Open
    *Extension Manager* (installed by the script) → search **gtile** (or
    **Pop Shell**, or **Forge**) → enable. Suggested keybinds in gtile
@@ -106,9 +122,10 @@ git commit -am "tmux: ..." && git push
 `cd ~/dotfiles && git pull`. `alias nn` / the `bashrc` alias open the right
 files either way.
 
-To bring **more** config into the repo later (nvim, mise, alacritty):
-`mkdir -p ~/dotfiles/.config/nvim`, move the real dir there, and symlink it
-back — same pattern `install-shell.sh` already uses.
+To bring **more** config into the repo later (mise, alacritty):
+`mkdir -p ~/dotfiles/.config/foo`, move the real dir there, and symlink it
+back — same pattern `install-shell.sh` already uses (that's how `.config/nvim`
+and `.config/tmux` are wired).
 
 ## Cheat sheet for the new tools
 
@@ -121,7 +138,59 @@ back — same pattern `install-shell.sh` already uses.
 | mise     | version-manager for dev runtimes   | `mise use -g node@22`, `mise ls`                        |
 | uv       | fast python                        | `uv run --with requests script.py`, `uv init`           |
 | lazygit  | TUI git client                     | type `g` (alias it yourself in `.bashrc` if wanted)     |
+| lazydocker | TUI for docker ps/logs/exec      | `lazydocker`, then j/k/enter to drill, `l` for logs     |
+| ctop     | `top` for container metrics        | `ctop` (live CPU/mem/net per container)                 |
+| dive     | inspect image layers for bloat     | `dive myimage:latest`                                   |
+| k9s      | TUI for Kubernetes clusters        | `k9s`, `:pod /app`, `l` logs, `s` shell, `:ctx` switch  |
+| just     | modern task runner (Make-style)    | `just` in a repo with a `justfile`; `just <task>`       |
+| hadolint | Dockerfile linter                  | `hadolint Dockerfile` (or in CI/pre-commit)             |
+| trivy    | all-in-one scanner                 | `trivy image foo:latest`, `trivy fs .`, `trivy config infra/` |
+| gitleaks | secret scanner                     | `gitleaks protect --staging` (pre-commit hook)          |
+| grype/syft | CVE scan / SBOM                  | `syft . -o spdx-json > sbom.json` ; `grype sbom:sbom.json` |
+| checkov  | IaC scanner (TF/K8s/Helm/Dockerfile) | `checkov -d infra/`                                   |
+| cosign   | sign/verify OCI artifacts          | `cosign verify image:tag`                               |
+| pre-commit | git hook manager                 | `pre-commit install` in a repo, edit `.pre-commit-config.yaml` |
+| virt-manager | GUI for KVM/libvirt VMs         | launch from app grid; `--server` skips it               |
+| opencode   | AI coding agent in the terminal | `opencode` in a project → `/connect` to add a provider  |
+| ollama     | local LLMs on your RTX          | `ollama pull llama3.2`, `ollama run llama3.2`, `ollama ps` shows GPU/CPU split |
+| ghostty    | default terminal (26.04 apt)    | config is symlinked from dotfiles; `shift+insert` paste |
+| `ml`       | activate the ML venv            | `ml && python -c "import pandas"` ; `uv pip install torch --python ~/.venvs/ml/bin/python` for GPU torch |
 | eza/bat/fd/rg | already in your muscle memory  | `l`, `ll`, `f`, plain `grep` = rg                       |
+
+## Neovim — exact replica of the Omarchy setup
+
+`.config/nvim` is a copy of the current Omarchy config: **LazyVim** (starter,
+lockfile-pinned via `lazy-lock.json`) with the Omarchy extras — everforest
+theme, theme hot-reload, all-themes registry, transparency, OSC52 remote
+clipboard, neo-tree + clangd/python/rust language extras. Autocomplete
+(blink.cmp), LSP, treesitter, and Mason tooling all come from LazyVim itself.
+
+On first `nvim` launch lazy.nvim bootstraps everything and installs the pinned
+plugin set; Mason then auto-installs LSP servers/formatters per file type you
+open. Node-based servers need node — `mise use -g node@22` before first launch
+(or run `:Mason` and install on demand). `wl-clipboard` (installed by the
+script) backs the OSC52 clipboard integration; inside tmux it works over SSH too.
+
+The Omarchy-only pieces degrade gracefully: theme hot-reload only reacts to
+`LazyReload`, and remote clipboard falls back to OSC52 query when no
+`wl-copy` is present — nothing on Ubuntu will error with these files present.
+
+Keybindings are the standard LazyVim ones (leader = Space), e.g.:
+
+| Keys              | What                                        |
+| ----------------- | ------------------------------------------- |
+| `<leader>ff`      | Find files (telescope, fd+ripgrep-backed)    |
+| `<leader>fg`      | Live grep                                    |
+| `<leader>fr`      | Resume last picker                           |
+| `<leader>e` / `-` | neo-tree / oil-style parent-dir browsing     |
+| `gr` / `gd` / `K` | LSP references / definition / hover          |
+| `<leader>ca` / `<leader>rn` | Code action / rename             |
+| `<leader>xx` / `<leader>xX` | Buffer / all diagnostics         |
+| `<leader>qq`      | Quit all                                     |
+
+On top of that, `lua/plugins/harpoon.lua` adds **Harpoon v2** (auto-imported
+by LazyVim): `<leader>a` add file to shelf, `<C-e>` or `<leader>hh` quick
+menu, `<leader>h1..4` jump to slots 1–4, `<leader>hp/hn` prev/next.
 
 Enable delta as git's pager once per machine:
 
