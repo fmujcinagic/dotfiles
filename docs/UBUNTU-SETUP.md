@@ -36,7 +36,7 @@ atuin import bash     # fold pre-existing history into atuin, once
 | Source                | Land in                | Tools                                    |
 | --------------------- | ---------------------- | ---------------------------------------- |
 | apt (core)            | `/usr/bin`             | tmux, fzf, ripgrep, bat, fd-find, btop, jq, ncurses-term, build-essential, cmake, ninja, pkg-config, ccache, **clang/clangd/clang-tools, gdb, lldb, valgrind, cppcheck** (C/C++), python3-dev, ubuntu-drivers-common, gh (own repo) |
-| apt (desktop only)    | `/usr/bin`             | **ghostty** (Ubuntu 26.04 universe — made the default terminal via gsettings + x-terminal-emulator), gnome-tweaks, copyq, timeshift, qemu-kvm, libvirt, virt-manager, wl-clipboard |
+| apt (desktop only)    | `/usr/bin`             | **ghostty** (Ubuntu 26.04 universe — made the one-and-only default terminal via `~/.config/xdg-terminals.list`, which GNOME's Ctrl+Alt+T reads through `xdg-terminal-exec`), gnome-tweaks, copyq, timeshift, qemu-kvm, libvirt, virt-manager, wl-clipboard |
 | Official installers   | `~/.local/bin`         | starship\*, zoxide, uv, mise, atuin\*, **opencode** |
 | GitHub release assets | `~/.local/bin`         | eza, delta, tlrc (command `tldr`), neovim, lazygit, yq, lazydocker, dive, ctop, k9s, just, hadolint, trivy, gitleaks, grype, syft, cosign |
 | uv tool (isolated envs) | `~/.local/bin`       | checkov, pre-commit                      |
@@ -45,7 +45,7 @@ atuin import bash     # fold pre-existing history into atuin, once
 | ubuntu-drivers (if NVIDIA GPU present) | kernel module + `nvidia-smi` | proprietary NVIDIA driver stack |
 | ollama.com installer  | `/usr/local/bin` + systemd service | **ollama** (uses the NVIDIA GPU after reboot) |
 | Docker official script (opt-in `--docker`) | `/usr/bin` | docker, docker compose      |
-| Dotfiles symlinks     | `~/`                   | `.bashrc`, `.bash_profile`, `.config/tmux/tmux.conf`, `.config/starship.toml`, `.config/nvim`, `.config/ghostty` |
+| Dotfiles symlinks     | `~/`                   | `.bashrc`, `.bash_profile`, `.config/tmux/tmux.conf`, `.config/starship.toml`, `.config/nvim`, `.config/ghostty`, `.config/xdg-terminals.list` |
 
 \* starship goes to `/usr/local/bin` via sudo; atuin's binary also lives in
 `~/.atuin/bin` (on PATH via `~/.local/bin`).
@@ -80,13 +80,17 @@ and LSP support, so the script deliberately ignores it.
 ## Manual steps after the script (desktop only)
 
 1. **Terminal.** Ghostty is installed (Ubuntu 26.04's own apt package — no
-   PPA needed), set as the GNOME default, and its config is symlinked from
-   `.config/ghostty` (same as on Omarchy; the dynamic theme `config-file =
-   ?"..."` include is guarded and simply skipped without Omarchy). The
-   JetBrainsMono Nerd Font installed by the script is referenced by that
-   config. Log out/in after a `--docker` install or an NVIDIA driver install
-   (the latter needs a reboot for `nvidia-smi`/Ollama GPU to come up — check
-   with `ollama ps`, model should list "100% GPU").
+   PPA needed), set as the one-and-only default terminal, and its config is
+   symlinked from `.config/ghostty` (same as on Omarchy; the dynamic theme
+   `config-file = ?"..."` include is guarded and simply skipped without
+   Omarchy). GNOME's Ctrl+Alt+T launches `xdg-terminal-exec`, which reads the
+   first entry of `~/.config/xdg-terminals.list` (symlinked from the repo, so
+   only Ghostty is listed) — the legacy `x-terminal-emulator` alternative is
+   also pointed at Ghostty. The JetBrainsMono Nerd Font installed by the
+   script is referenced by that config. Log out/in after a `--docker` install
+   or an NVIDIA driver install (the latter needs a reboot for
+   `nvidia-smi`/Ollama GPU to come up — check with `ollama ps`, model should
+   list "100% GPU").
 2. **Tiling.** Vanilla GNOME won't feel like Hyprland. Open
    *Extension Manager* (installed by the script) → search **gtile** (or
    **Pop Shell**, or **Forge**) → enable. Suggested keybinds in gtile
@@ -133,6 +137,8 @@ and `.config/tmux` are wired).
 | Tool     | What it does                       | Try                                                    |
 | -------- | ---------------------------------- | ------------------------------------------------------ |
 | zoxide   | `cd` that learns from history      | `z proj`, `z <tab>`, `at` for fzf-pick                  |
+| fzf (shell keys) | fuzzy file/dir/history pickers | `Ctrl+T` pick files, `Alt+C` cd into a dir, `Ctrl+R` history |
+| bash completion | case-insensitive, `-`≡`_` | type `cd doc<Tab>` → `Documents/` (no exact caps needed) |
 | atuin    | SQLite history, replaces Ctrl+R    | Ctrl+R, then search across *all* machines' history      |
 | tldr     | practical man pages (tlrc)         | `tldr tar`, `tldr git rebase`             |
 | delta    | pretty git diffs                   | not auto-wired — enable once per machine (snippet below) |

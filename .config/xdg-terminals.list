@@ -1,0 +1,4 @@
+# Preferred terminal for XDG Terminal Execution (xdg-terminal-exec), which is what
+# Ubuntu/GNOME's default "org.gnome.desktop.default-applications.terminal" uses.
+# The first entry wins, so Ghostty is the one and only default terminal here.
+com.mitchellh.ghostty.desktop

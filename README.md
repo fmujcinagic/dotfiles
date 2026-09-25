@@ -13,6 +13,7 @@ pieces are guarded and silently skipped elsewhere.
 | `.config/starship.toml`  | `~/.config/starship.toml`    |
 | `.config/nvim`           | `~/.config/nvim` (dir)       |
 | `.config/ghostty`        | `~/.config/ghostty` (dir)    |
+| `.config/xdg-terminals.list` | `~/.config/xdg-terminals.list` |
 
 ### Replicate on a new machine
 
@@ -50,5 +51,6 @@ back to their usual names in `.bashrc`.
 
 ## Legacy i3 setup
 
-`install-new.sh` and `.config/{i3,alacritty,picom}` are from an older
-i3-on-Ubuntu setup, kept for reference.
+`install-new.sh` and `.config/{i3,picom}` are from an older i3-on-Ubuntu
+setup, kept for reference. The i3 config launches Ghostty (the only terminal);
+the old Alacritty config was removed.

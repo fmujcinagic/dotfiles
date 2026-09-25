@@ -8,8 +8,9 @@ font pango:RobotoMono Nerd Font Regular 9
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
-# start a terminal
-bindsym $mod+Return exec alacritty
+# start a terminal (ghostty is the only terminal)
+bindsym $mod+Return exec ghostty
+bindsym Control+Mod1+t exec ghostty
 
 # kill focused window
 bindsym $mod+Shift+q kill

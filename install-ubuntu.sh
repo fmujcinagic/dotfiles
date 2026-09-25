@@ -81,14 +81,17 @@ if [[ $SERVER == 0 ]]; then
     cpu-checker wl-clipboard \
     ghostty || fail "apt desktop batch"
   $SUDO usermod -aG libvirt "$USER" 2>/dev/null || true
-  # Make Ghostty the default terminal (GNOME + x-terminal-emulator)
+  # Make Ghostty the one and only default terminal.
   if command -v ghostty >/dev/null 2>&1; then
-    gsettings set org.gnome.desktop.default-app terminal.exec 'ghostty' 2>/dev/null \
-      && ok "GNOME default terminal -> ghostty" || true
-    $SUDO update-alternatives --set x-terminal-emulator "$(command -v ghostty)" 2>/dev/null \
-      || $SUDO update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator "$(command -v ghostty)" 50 2>/dev/null \
-      || true
-    ok "x-terminal-emulator -> ghostty"
+    # GNOME's Ctrl+Alt+T runs xdg-terminal-exec, which reads the first entry of
+    # ~/.config/xdg-terminals.list — link the dotfiles copy so ghostty wins.
+    mkdir -p ~/.config
+    [[ -e .config/xdg-terminals.list ]] && ln -sfn "$PWD/.config/xdg-terminals.list" ~/.config/xdg-terminals.list
+    # Fallback for legacy apps that call x-terminal-emulator directly.
+    ghostty_path=$(command -v ghostty)
+    $SUDO update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator "$ghostty_path" 60 2>/dev/null || true
+    $SUDO update-alternatives --set x-terminal-emulator "$ghostty_path" 2>/dev/null || true
+    ok "default terminal -> ghostty (xdg-terminal-exec + x-terminal-emulator)"
   fi
 fi
 

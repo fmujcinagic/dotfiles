@@ -27,10 +27,30 @@ if command -v eza >/dev/null 2>&1; then
   alias ll='eza -lh --group-directories-first --icons=auto --git'
 fi
 
-# History search with fzf on Ctrl+R (Arch and Ubuntu use different paths)
-for f in /usr/share/fzf/shell/key-bindings.bash /usr/share/fzf/key-bindings.bash /etc/bash_completion.d/fzf; do
-  [[ -r $f ]] && source $f
+# fzf key bindings: Ctrl+R history, Ctrl+T fuzzy file picker, Alt+C fuzzy cd.
+# The paths differ per distro (Arch/Omarchy vs Debian/Ubuntu's doc examples).
+for f in \
+  /usr/share/fzf/shell/key-bindings.bash \
+  /usr/share/fzf/key-bindings.bash \
+  /etc/bash_completion.d/fzf \
+  /usr/share/doc/fzf/examples/key-bindings.bash
+do
+  [[ -r $f ]] && source "$f" && break
 done
+
+# Case-insensitive tab completion: `cd doc<Tab>` -> Documents/, `-`/`_` interchangeable.
+bind 'set completion-ignore-case on' 2>/dev/null
+bind 'set completion-map-case on' 2>/dev/null
+bind 'set show-all-if-ambiguous on' 2>/dev/null
+
+# Previews for the fzf pickers (Ctrl+T shows the file, Alt+C lists the dir).
+if command -v fzf >/dev/null 2>&1; then
+  __bat=$(type -P bat || type -P batcat || true)
+  [[ -n $__bat ]] && export FZF_CTRL_T_OPTS="--preview '$__bat --style=numbers --color=always --line-range :200 {}'"
+  __eza=$(type -P eza || true)
+  [[ -n $__eza ]] && export FZF_ALT_C_OPTS="--preview '$__eza --tree --level=1 --icons=auto --group-directories-first {}'"
+  unset __bat __eza
+fi
 
 # Tool inits (guarded so they're no-ops when the tool isn't installed).
 # atuin init goes last so it wins the Ctrl+R binding over fzf.

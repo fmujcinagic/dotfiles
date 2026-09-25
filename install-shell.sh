@@ -49,5 +49,6 @@ link .config/tmux/tmux.conf
 link .config/starship.toml
 link .config/nvim
 link .config/ghostty
+link .config/xdg-terminals.list
 
 echo "Done. Reload your shell (or log out/in) and restart tmux."
