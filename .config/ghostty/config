@@ -1,10 +1,10 @@
 # Dynamic theme colors
 config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
-
+theme = Aura
 # Font
 font-family = "JetBrainsMono Nerd Font"
 font-style = Regular
-font-size = 11
+font-size = 16
 
 # Window
 window-theme = ghostty
@@ -21,6 +21,9 @@ cursor-style-blink = false
 # Cursor styling + SSH session terminfo
 # (all shell integration options must be passed together)
 shell-integration-features = no-cursor,ssh-env
+
+# Every new Ghostty surface starts its own fresh tmux session
+command = tmux new-session
 
 # Keyboard bindings
 keybind = shift+insert=paste_from_clipboard

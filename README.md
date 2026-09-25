@@ -19,7 +19,8 @@ pieces are guarded and silently skipped elsewhere.
 
 **Fresh Ubuntu — one-shot** (dotfiles + tmux/fzf/eza/etc. + zoxide, atuin,
 mise, uv, nvim with the Omarchy LazyVim config replicated + harpoon,
-ghostty as default terminal (with the Omarchy config),
+ghostty as default terminal (with the Omarchy config, each window starting a
+fresh tmux session),
 lazygit, lazydocker, dive, ctop, k9s, just,
 delta, gh, yq, tlrc, trivy/gitleaks/checkov/grype/syft/hadolint/cosign/pre-commit,
 C/C++ toolchain (clang/gdb/cmake/ninja/ccache), Java toolchain (OpenJDK LTS

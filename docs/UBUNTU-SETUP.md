@@ -83,11 +83,14 @@ and LSP support, so the script deliberately ignores it.
    PPA needed), set as the one-and-only default terminal, and its config is
    symlinked from `.config/ghostty` (same as on Omarchy; the dynamic theme
    `config-file = ?"..."` include is guarded and simply skipped without
-   Omarchy). GNOME's Ctrl+Alt+T launches `xdg-terminal-exec`, which reads the
+   Omarchy). GNOME's terminal shortcut is set to win+enter (Super+Return,
+   replacing Ctrl+Alt+T) and launches `xdg-terminal-exec`, which reads the
    first entry of `~/.config/xdg-terminals.list` (symlinked from the repo, so
    only Ghostty is listed) — the legacy `x-terminal-emulator` alternative is
    also pointed at Ghostty. The JetBrainsMono Nerd Font installed by the
-   script is referenced by that config. Log out/in after a `--docker` install
+   script is referenced by that config, and every new Ghostty surface starts
+   a fresh tmux session (`command = tmux new-session`).
+   Log out/in after a `--docker` install
    or an NVIDIA driver install (the latter needs a reboot for
    `nvidia-smi`/Ollama GPU to come up — check with `ollama ps`, model should
    list "100% GPU").

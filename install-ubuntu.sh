@@ -92,6 +92,11 @@ if [[ $SERVER == 0 ]]; then
     $SUDO update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator "$ghostty_path" 60 2>/dev/null || true
     $SUDO update-alternatives --set x-terminal-emulator "$ghostty_path" 2>/dev/null || true
     ok "default terminal -> ghostty (xdg-terminal-exec + x-terminal-emulator)"
+    # Move GNOME's terminal shortcut from Ctrl+Alt+T to win+enter (Super+Return).
+    if command -v gsettings >/dev/null 2>&1; then
+      gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "['<Super>Return']" 2>/dev/null \
+        && ok "terminal shortcut -> win+enter (Super+Return)" || true
+    fi
   fi
 fi
 
@@ -139,13 +144,14 @@ log "[5/12] Python-based security tooling (isolated envs via uv)"
 command -v checkov    >/dev/null 2>&1 || uv tool install --quiet checkov    && ok checkov    || fail checkov
 command -v pre-commit >/dev/null 2>&1 || uv tool install --quiet pre-commit && ok pre-commit || fail pre-commit
 
-log "[6/12] Java toolchain via mise (JDK LTS + Maven + Gradle)"
+log "[6/12] Language toolchains via mise (Node + JDK LTS + Maven + Gradle)"
 if command -v mise >/dev/null 2>&1; then
+  command -v node   >/dev/null 2>&1 || mise use -g node@lts && ok "node (LTS)"  || fail "node"
   command -v java   >/dev/null 2>&1 || mise use -g java@lts && ok "java (LTS)"  || fail "java"
   command -v mvn    >/dev/null 2>&1 || mise use -g maven    && ok "maven"      || fail maven
   command -v gradle >/dev/null 2>&1 || mise use -g gradle   && ok "gradle"     || fail gradle
 else
-  fail "java stack (mise not installed)"
+  fail "language toolchains (mise not installed)"
 fi
 
 log "[7/12] ML/data-science venv (~/.venvs/ml, managed by uv)"

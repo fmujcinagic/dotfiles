@@ -53,10 +53,11 @@ if command -v fzf >/dev/null 2>&1; then
 fi
 
 # Tool inits (guarded so they're no-ops when the tool isn't installed).
-# atuin init goes last so it wins the Ctrl+R binding over fzf.
+# atuin runs without binding Ctrl+R, so the fzf Ctrl+R history picker above wins
+# (atuin still owns the Up arrow and its own history tracking/sync).
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)" && alias at='z $(fzf)'
 command -v mise   >/dev/null 2>&1 && eval "$(mise activate bash)"
-command -v atuin  >/dev/null 2>&1 && eval "$(atuin init bash)"
+command -v atuin  >/dev/null 2>&1 && eval "$(atuin init bash --disable-ctrl-r)"
 
 # Bigger, deduped history
 HISTSIZE=50000
@@ -102,3 +103,4 @@ mkcd() { mkdir -p "$1" && builtin cd "$1"; }
 
 # extract: unzip whatever archive
 extract() { case "$1" in *.tar.bz2|*.tbz2) tar xvjf "$1";; *.tar.gz|*.tgz) tar xvzf "$1";; *.tar.xz) tar xJf "$1";; *.tar) tar xvf "$1";; *.zip) unzip "$1";; *.rar) unrar x "$1";; *.7z) 7z x "$1";; *.gz) gunzip "$1";; *) echo "Unknown archive: $1";; esac; }
+alias lg="lazygit"
