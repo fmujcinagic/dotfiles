@@ -1,16 +1,24 @@
 #!/usr/bin/env bash
 # Install the shell/tmux/starship dotfiles. Idempotent; run on any machine.
-# Usage: ./install-shell.sh [--no-deps]
+# Usage: ./install-shell.sh [--no-deps] [--no-tmux]
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")"
 
 DEPS=1
-[[ "${1:-}" == "--no-deps" ]] && DEPS=0
+WITH_TMUX=1
+for arg in "$@"; do
+  case $arg in
+    --no-deps) DEPS=0 ;;
+    --no-tmux) WITH_TMUX=0 ;;
+  esac
+done
 
 if [[ $DEPS == 1 ]] && command -v apt-get >/dev/null 2>&1; then
   echo "==> Installing Ubuntu dependencies..."
+  deps=(tmux fzf ripgrep bat fd-find ncurses-term curl git)
+  [[ $WITH_TMUX == 0 ]] && deps=(fzf ripgrep bat fd-find ncurses-term curl git)
   sudo apt-get update
-  sudo apt-get install -y tmux fzf ripgrep bat fd-find ncurses-term curl git
+  sudo apt-get install -y "${deps[@]}"
 
   if ! command -v eza >/dev/null 2>&1; then
     echo "==> Installing eza (not in Ubuntu repos)..."
@@ -45,7 +53,7 @@ link() {
 
 link .bashrc
 link .bash_profile
-link .config/tmux/tmux.conf
+[[ $WITH_TMUX == 1 ]] && link .config/tmux/tmux.conf
 link .config/starship.toml
 link .config/nvim
 link .config/ghostty

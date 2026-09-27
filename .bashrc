@@ -104,3 +104,5 @@ mkcd() { mkdir -p "$1" && builtin cd "$1"; }
 # extract: unzip whatever archive
 extract() { case "$1" in *.tar.bz2|*.tbz2) tar xvjf "$1";; *.tar.gz|*.tgz) tar xvzf "$1";; *.tar.xz) tar xJf "$1";; *.tar) tar xvf "$1";; *.zip) unzip "$1";; *.rar) unrar x "$1";; *.7z) 7z x "$1";; *.gz) gunzip "$1";; *) echo "Unknown archive: $1";; esac; }
 alias lg="lazygit"
+alias vi="nvim"
+alias vim="nvim"
